@@ -3,136 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica Veterinaria - Agendamiento de Citas</title>
-    <!-- Vinculación del archivo CSS independiente -->
+    <title>Clínica Veterinaria - Sistema de Reserva y Agendamiento</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>Clínica Veterinaria</h1>
-        <p>Sistema de Reserva y Agendamiento de Citas (CitasAgendaModulo)</p>
+    
+    <!-- Banner de Alerta Superior -->
+    <div id="alertBanner" class="alert-banner">
+        <div class="alert-content">
+            <span>✔</span>
+            <span id="alertMessage">Cita agendada exitosamente (Cita registrada con éxito)</span>
+        </div>
+        <button class="alert-close" onclick="document.getElementById('alertBanner').style.display='none'">✕</button>
     </div>
 
-    <div class="card">
-        <div id="alertBox" class="alert"></div>
+    <div class="main-grid">
+        
+        <!-- Columna Izquierda: Formulario de Agendamiento -->
+        <div class="card-form">
+            <div class="header-teal">
+                <h2>📅 Agendar Nueva Cita</h2>
+                <p>Selecciona fecha y franja horaria</p>
+            </div>
+            
+            <form id="appointmentForm" class="form-body">
+                <div class="form-group">
+                    <label>Rol del Operador</label>
+                    <select id="operatorRole" class="form-control" required>
+                        <option value="Recepcion" selected>Recepción</option>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Profesional">Profesional Veterinario</option>
+                    </select>
+                </div>
 
-        <form id="appointmentForm">
-            <div class="form-group">
-                <label>Rol del Operador (RN-11):</label>
-                <select id="operatorRole" required>
-                    <option value="Recepcion">Recepción</option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Profesional">Profesional Veterinario</option>
-                </select>
+                <div class="form-group">
+                    <label>Paciente (Mascota - Dueño)</label>
+                    <select id="petOwner" class="form-control" required>
+                        <option value="" disabled selected>Seleccione un paciente...</option>
+                        <option value="Firulais|Carlos Mendoza">Firulais - Carlos Mendoza</option>
+                        <option value="Michi|Ana Gómez">Michi - Ana Gómez</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Médico Veterinario</label>
+                    <select id="doctor" class="form-control" required>
+                        <option value="" disabled selected>Seleccione un profesional...</option>
+                        <option value="Dr. Roberto Gómez">Dr. Roberto Gómez</option>
+                        <option value="Dra. Laura Martínez">Dra. Laura Martínez</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Servicio Requerido</label>
+                    <select id="service" class="form-control" required>
+                        <option value="" disabled selected>Seleccione un servicio...</option>
+                        <option value="Vacunación Canina">Vacunación Canina</option>
+                        <option value="Consulta General">Consulta General</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha de la Cita</label>
+                    <input type="datetime-local" id="appointmentDateTime" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Guardar Cita</button>
+            </form>
+        </div>
+
+        <!-- Columna Derecha: Disponibilidad y Lista de Citas -->
+        <div class="right-column">
+            
+            <!-- Disponibilidad del Día -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">🕒 Disponibilidad del Día</div>
+                        <div class="section-subtitle">Horarios: 7–8, 8–10, 10–12, 14–16</div>
+                    </div>
+                    <div class="date-picker-group">
+                        <input type="text" value="22/10/2026" class="form-control" style="width: 110px; text-align: center; font-size: 0.85rem;" readonly>
+                        <button class="btn-sm">Ver</button>
+                    </div>
+                </div>
+
+                <div class="availability-grid">
+                    <div class="slot-box slot-occupied">
+                        <span>07:00 AM – 08:00</span>
+                        <span class="badge-pill badge-red">Ocupado</span>
+                    </div>
+                    <div class="slot-box slot-available">
+                        <span>08:00 AM – 10:00</span>
+                        <span class="badge-pill badge-green">Disponible</span>
+                    </div>
+                    <div class="slot-box slot-available">
+                        <span>10:00 AM – 12:00</span>
+                        <span class="badge-pill badge-green">Disponible</span>
+                    </div>
+                    <div class="slot-box slot-available">
+                        <span>02:00 PM – 04:00</span>
+                        <span class="badge-pill badge-green">Disponible</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Paciente (Mascota - Dueño):</label>
-                <select id="petOwner" required>
-                    <option value="">Seleccione un paciente...</option>
-                    <option value="Firulais - Carlos Mendoza">Firulais (Perro) - Carlos Mendoza</option>
-                    <option value="Michi - Ana Gómez">Michi (Gato) - Ana Gómez</option>
-                </select>
+            <!-- Citas Programadas -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div class="section-title">📋 Citas Programadas (2026-10-22)</div>
+                </div>
+
+                <table class="appointments-table">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Paciente</th>
+                            <th>Veterinario</th>
+                            <th>Servicio</th>
+                            <th style="text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsList">
+                        <tr>
+                            <td><span class="time-badge">07:00 – 07:20</span></td>
+                            <td class="patient-info">
+                                <strong>Firulais</strong>
+                                <span>Carlos Mendoza</span>
+                            </td>
+                            <td>Dr. Roberto Gómez</td>
+                            <td>Vacunación Canina</td>
+                            <td style="text-align: center;">
+                                <button class="btn-icon-danger" onclick="this.closest('tr').remove()">🗑</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="time-badge">23:49 – 00:09</span></td>
+                            <td class="patient-info">
+                                <strong>Firulais</strong>
+                                <span>Carlos Mendoza</span>
+                            </td>
+                            <td>Dr. Roberto Gómez</td>
+                            <td>Vacunación Canina</td>
+                            <td style="text-align: center;">
+                                <button class="btn-icon-danger" onclick="this.closest('tr').remove()">🗑</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="form-group">
-                <label>Médico Veterinario:</label>
-                <select id="doctor" required>
-                    <option value="">Seleccione un profesional...</option>
-                    <option value="Dr. Roberto Gómez">Dr. Roberto Gómez - Medicina General</option>
-                    <option value="Dra. Laura Martínez">Dra. Laura Martínez - Cirugía</option>
-                </select>
-            </div>
+        </div>
 
-            <div class="form-group">
-                <label>Servicio Requerido:</label>
-                <select id="service" required>
-                    <option value="">Seleccione un servicio...</option>
-                    <option value="Vacunación Canina">Vacunación Canina (30 min)</option>
-                    <option value="Consulta General">Consulta General (30 min)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Fecha y Hora de la Cita:</label>
-                <input type="datetime-local" id="appointmentDateTime" required>
-            </div>
-
-            <button type="submit" class="btn">Agendar Nueva Cita</button>
-        </form>
-
-        <h3 style="margin-top: 35px; color: #374151;">Citas Programadas</h3>
-        <table class="appointments-table">
-            <thead>
-                <tr>
-                    <th>Fecha / Hora</th>
-                    <th>Paciente</th>
-                    <th>Veterinario</th>
-                    <th>Servicio</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody id="appointmentsList">
-                <tr>
-                    <td>2026-10-22 09:00</td>
-                    <td>Firulais (Carlos Mendoza)</td>
-                    <td>Dr. Roberto Gómez</td>
-                    <td>Vacunación Canina</td>
-                    <td><span class="badge badge-scheduled">Programada</span></td>
-                </tr>
-            </tbody>
-        </table>
     </div>
+
 </div>
 
 <script>
     document.getElementById('appointmentForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const alertBox = document.getElementById('alertBox');
+        const alertBanner = document.getElementById('alertBanner');
+        const alertMessage = document.getElementById('alertMessage');
         const role = document.getElementById('operatorRole').value;
         const dateTimeVal = document.getElementById('appointmentDateTime').value;
         const selectedTime = new Date(dateTimeVal);
         const now = new Date();
         
-        // Calcular horas de anticipación (RN-04)
         const diffHours = (selectedTime - now) / (1000 * 60 * 60);
 
-        alertBox.style.display = 'block';
+        alertBanner.style.display = 'flex';
 
-        // Validación RN-11
+        // Validaciones de Reglas de Negocio
         if (role === 'Profesional') {
-            alertBox.className = 'alert alert-danger';
-            alertBox.innerHTML = '⚠️ Error: El rol Profesional no tiene permisos para agendar citas (RN-11).';
+            alertBanner.style.backgroundColor = '#f8d7da';
+            alertBanner.style.borderColor = '#f5c6cb';
+            alertBanner.style.color = '#721c24';
+            alertMessage.innerHTML = 'Error: El rol Profesional no tiene permisos para agendar citas (RN-11).';
             return;
         }
 
-        // Validación RN-04
         if (diffHours < 2) {
-            alertBox.className = 'alert alert-danger';
-            alertBox.innerHTML = '⚠️ Error: Las citas deben programarse con al menos 2 horas de anticipación (RN-04).';
+            alertBanner.style.backgroundColor = '#f8d7da';
+            alertBanner.style.borderColor = '#f5c6cb';
+            alertBanner.style.color = '#721c24';
+            alertMessage.innerHTML = 'Error: Las citas deben programarse con al menos 2 horas de anticipación (RN-04).';
             return;
         }
 
-        // Si pasa las reglas: Éxito
-        alertBox.className = 'alert alert-success';
-        alertBox.innerHTML = '✅ Cita agendada exitosamente (Cita registrada con éxito).';
+        // Si es Exitoso
+        alertBanner.style.backgroundColor = '#d1e7dd';
+        alertBanner.style.borderColor = '#badbcc';
+        alertBanner.style.color = '#0f5132';
+        alertMessage.innerHTML = 'Cita agendada exitosamente (Cita registrada con éxito)';
 
         // Agregar fila a la tabla
-        const pet = document.getElementById('petOwner').value;
+        const petVal = document.getElementById('petOwner').value.split('|');
         const doctor = document.getElementById('doctor').value;
         const service = document.getElementById('service').value;
+
+        const hours = selectedTime.getHours().toString().padStart(2, '0');
+        const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+        const timeStr = `${hours}:${minutes} – ${hours}:${(parseInt(minutes)+20).toString().padStart(2, '0')}`;
 
         const tbody = document.getElementById('appointmentsList');
         const newRow = `
             <tr>
-                <td>${dateTimeVal.replace('T', ' ')}</td>
-                <td>${pet}</td>
+                <td><span class="time-badge">${timeStr}</span></td>
+                <td class="patient-info">
+                    <strong>${petVal[0]}</strong>
+                    <span>${petVal[1]}</span>
+                </td>
                 <td>${doctor}</td>
                 <td>${service}</td>
-                <td><span class="badge badge-scheduled">Programada</span></td>
+                <td style="text-align: center;">
+                    <button class="btn-icon-danger" onclick="this.closest('tr').remove()">🗑</button>
+                </td>
             </tr>
         `;
         tbody.innerHTML += newRow;
